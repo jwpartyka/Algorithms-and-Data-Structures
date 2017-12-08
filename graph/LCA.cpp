@@ -32,5 +32,5 @@ int LCA(int a, int b)
             b = lcap[b][i];
         }
     }
-    return lca[b][0];
+    return lcap[b][0];
 }
