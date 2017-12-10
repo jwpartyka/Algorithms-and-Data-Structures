@@ -1,18 +1,16 @@
 //Znajdywanie LCA w czasie stałym po liniowym preprocessingu
-//Złożoność czasowa preprocessingu: O(|V|) <- duża stała
+//Złożoność czasowa preprocessingu: O(|V|) <-- Stała rzędu kilkanaście
 //Złożoność czasowa zapytania: O(1)
-//Złożoność pamięciowa programu: O(n) <- duża stała
+//Złożoność pamięciowa programu: O(|V|) <-- Stała rzędu kilkanaście, dla N <= 500 000 ---> ~30MB
 //Algorytm sprowadza LCA do problemu RMQ w czasie liniowym
-//Dodatkowo każda kolejna wartość w tablicy różni się o +/- 1
+//Dodatkowo każda kolejna wartość w tablicy różni się o 1
 //dlatego preprocessing można zrobić w czasie liniowym, a nie liniowo - logarytmicznym jak w zwykłym RMQ
 
-#define st first
-#define nd second
+const int MAXN = 1e6+5, LOG = 20, logg = 10, maxn = 2*MAXN/LOG+5, INF = 2e6;
+//MAXN = 2 * limit na N, LOG = log(N), logg = 0.5 * log(N), maxn = 4*N/log(N) = 2*MAXN/LOG
 
-const int MAXN = 2e6+5, LOG = 20, logg = 10, maxn = MAXN/LOG+5, INF = 2e6;
-
-int D[MAXN], A[MAXN], pierwsze[MAXN], group[maxn][logg+1], hasz[maxn], groupID[maxn], lookup[maxn][logg+1][logg+1], ST[maxn][LOG+1], N, nr;
-//A - Euler Tour grafu G, D - głebokości wierzchołków z A, pierwsze[i] - indeks pierwszego wystąpiena i w A,
+int ET[MAXN], D[MAXN], pierwsze[MAXN], group[maxn][logg+1], hasz[maxn], groupID[maxn], lookup[2000][logg+1][logg+1], ST[maxn][LOG], N, nr;
+//ET - Euler Tour grafu G, D - głebokości wierzchołków z ET, pierwsze[i] - indeks pierwszego wystąpiena i w ET,
 //group - podzial D na grupy o rozmiarze 0.5 * logN, hasz - hasze różnych rodzajów grup, groupID - hasze grup po przenumerowaniu,
 //lookup - wyniki dla różnych grup, ST - Sparse Table dla minimów ze wszystkich grup
 vector<int> G[MAXN]; //Graf
@@ -22,10 +20,10 @@ int p = 997; //Podstawa do haszowania
 void dodaj(int v, int d)
 {
     D[N] = d;
-    A[N] = v;
+    ET[N] = v;
     N++;
 }
-//Liczenie A i D
+//Liczenie ET i D
 void preprocessing(int v, int p, int d)
 {
     pierwsze[v] = N;
@@ -33,7 +31,6 @@ void preprocessing(int v, int p, int d)
     for (int u : G[v])
     {
         if (u == p) continue;
-        dist[u] = dist[v] + w;
         preprocessing(u, v, d+1);
         dodaj(v, d);
     }
@@ -102,20 +99,22 @@ int LCA(int l, int r)
     if (x == y)
     {
         int mini = x*logg + lookup[groupID[x]][l%logg][r%logg];
-        return A[mini];
+        return ET[mini];
     }
-
+    
     //Znalezienie minimum w lewej grupie
     int mini = x * logg + lookup[groupID[x]][l%logg][logg-1];
     int val = D[x * logg + lookup[groupID[x]][l%logg][logg-1]];
+    
     //Znalezienie minimum w prawej grupie
     if (val > D[y * logg +lookup[groupID[y]][0][r%logg]])
     {
         mini = y * logg + lookup[groupID[y]][0][r%logg];
         val = D[y * logg + lookup[groupID[y]][0][r%logg]];
     }
+    
     x++, y--;
-    if (x > y) return A[mini];
+    if (x > y) return ET[mini];
     //Znalezienie minimum pomiędzy prawą a lewą grupą
     int len = 31 - __builtin_clz(y-x+1);
     if (val > D[ST[x][len]])
@@ -127,7 +126,7 @@ int LCA(int l, int r)
     {
         mini = ST[y - (1<<len) + 1][len];
     }
-    return A[mini];
+    return ET[mini];
 }
 
 void przygotuj()
