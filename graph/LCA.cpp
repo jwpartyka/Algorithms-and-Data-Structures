@@ -1,10 +1,12 @@
 //Oblicza najniższego wspólnego przodka jump pointerami
 //Złożoność preprocessingu: O((|V| + |E|) * log|V|)
 //Złożoność LCA(a, b): O(log|V|)
+//Złożoność pamięciowa programu: O(|V| * log |V|)
 
 const int MAXN = 5e5+5, LOG = 20;
 
-int pre[MAXN], post[MAXN], lcap[MAXN][LOG+3], tim; //Numery pre- i postorder, przodkowie o 2^i w górę, czas odwiedzania wierzchołków
+//Numery preorder i postorder, przodkowie o 2^i w górę, czas odwiedzania wierzchołków
+int pre[MAXN], post[MAXN], lcap[MAXN][LOG+3], tim;
 vector<int> G[MAXN]; //Graf
 
 void preprocessing(int v, int p)
