@@ -7,33 +7,33 @@
 #define st first
 #define nd second
 
-const int MAXN = 5e5+5, INF = 1e9;
-int dist[MAXN]; //Odległości
+const int MAXN = 5e4+5, INF = 1e9;
+int dist[MAXN], relax[MAXN]; //Odległości, relax[v] - ile razy skrócono ścieżkę do v
+bool used[MAXN]; //Tablica mówiąca czy dany wierzchołek jest na kolejce
 vector<pair<int, int>> G[MAXN]; //Graf
-queue<pair<int, int>> Q; //Kolejka do SPFA
-int relax[MAXN]; //relax[v] - ile razy skrócono ścieżkę do v
+queue<int> Q; //Kolejka do SPFA
 
 bool SPFA(int start, int n)
 {
     for (int i = 1; i <= n; i++) dist[i] = INF;
     dist[start] = 0;
-    Q.push({0, start});
+    Q.push(start);
     while(!Q.empty())
     {
-        int v = Q.front().nd;
-        int ww = Q.front().st;
+        int v = Q.front();
         Q.pop();
-        if (dist[v] < ww) continue;
+        used[v] = 0, relax[v]++;
+        //Jeżeli skrócono najkrótszą ściężkę do v n-ty raz to istnieje ujemny cykl
+        if (relax[v] == n) return 0;
         for (auto e : G[v])
         {
             int u = e.st, w = e.nd;
             if (dist[u] > dist[v] + w)
             {
-                relax[u]++;
-                //Jeżeli nie ma ujemnego cyklu to relax[u] < n
-                if (relax[u] == n) return 0;
                 dist[u] = dist[v] + w;
-                Q.push({dist[u], u});
+                if (used[u]) continue;
+                used[u] = 1;
+                Q.push(u);
             }
         }
     }
