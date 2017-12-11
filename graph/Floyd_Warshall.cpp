@@ -1,10 +1,11 @@
 //Oblicza długości najkrótszych ścieżek pomiędzy każdą parą wierzchołków
+//Jeżeli występuje ujemny cykl to zwraca 0
 //Złożoność O(|V|^3)
 
 const int MAXN = 5e2+5, INF = 1e9;
 int dist[MAXN][MAXN]; //Odległości
 
-void floyd_warshall(int n)
+bool floyd_warshall(int n)
 {
     for (int i = 1; i <= n; i++)
     {
@@ -26,4 +27,11 @@ void floyd_warshall(int n)
             }
         }
     }
+    
+    for (int i = 1; i <= n; i++)
+    {
+        //Jeżeli ścieżka od wierzchołka do niego samego ma ujemną wagę to istnieje ujemny cykl
+        if (dist[i][i] < 0) return 0;
+    }
+    return 1;
 }
