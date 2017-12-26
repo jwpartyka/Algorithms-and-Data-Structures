@@ -107,7 +107,7 @@ struct Node
          {
              for (int i = 0; i < patt; i++)
              {
-                 cout << s << "\n";
+                 cout << s.substr(1, s.size()-1) << "\n";
              }
          }
          s.pop_back();
@@ -118,8 +118,8 @@ struct Node
 Node * root, *aho;
 void init()
 {
-    root = new Node('^', nullptr);
-    aho = new Node('*', root);
+    root = new Node(' ', nullptr);
+    aho = new Node(' ', root);
     aho->suflink = aho->patlink = root;
     for (int i = 0; i < 26; i++)
     {
