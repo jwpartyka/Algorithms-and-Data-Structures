@@ -5,7 +5,10 @@
 //3) n = p1^a1 * p2^a2 * ... * pk^ak
 //   Phi(n) = Phi(p1^a1) * Phi(p2^a2) * ... * Phi(pk^ak) =
 //          = (p1^a1 - p1^(a1-1)) * (p2^a2 - p2^(a2-1)) * ... * (pk^ak - pk^(ak-1)) =
-//          = p1^(a1-1) * (p1 - 1) * p2^(a2-1) * (p2 - 1) * ... * pk^(ak-1) * (pk - 1)
+//          = p1^(a1-1) * (p1 - 1) * p2^(a2-1) * (p2 - 1) * ... * pk^(ak-1) * (pk - 1) =
+//          = p1^a1 * (1 - 1/p1) * p2^a2 * (1 - 1/p2) * ... * pk^ak * (1 - 1/pk) =
+//          = n * ((p1 - 1) / p1) * ((p2 - 1) / p2) * ... * ((pk - 1) / pk) =
+//          = (n / (p1 * p2 * ... * pk)) * (p1 - 1) * (p2 - 1) * ... * (pk - 1)
 
 const int MAXN = 1e7+5;
 
@@ -15,23 +18,16 @@ void EulerPhi(int n)
 {
     for (int i = 1; i <= n; i++)
     {
-        phi[i] = 1;
+        phi[i] = i;
     }
 
     for (int i = 2; i <= n; i++)
     {
-        if (!sieve[i])
+        if (phi[i] == i)
         {
-            phi[i] = i-1;
-            for (int j = 2 * i; j <= n; j += i)
+            for (int j = i; j <= n; j += i)
             {
-                if (!sieve[j]) sieve[j] = i;
-                int p = 1;
-                while (j % (p * i * i) == 0)
-                {
-                    p *= i;
-                }
-                phi[j] *= (p * (i - 1));
+                phi[j] = phi[j] / i * (i - 1);
             }
         }
     }
