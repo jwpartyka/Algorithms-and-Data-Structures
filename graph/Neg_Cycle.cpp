@@ -1,6 +1,6 @@
 //Sprawdza przy użyciu Bellmana - Forda czy istnieje ujemny cykl osiągalny z wierzchołka src
 //Jeżeli chcemy znaleźć dowolny ujemny cykl to można do funkcji negCycle przekazać src = 0
-//Jeżeli istnieje ujemny cykl to otrzymamy kolejkę dwustronną z indeksami kolejnych krawędzi cyklu
+//Jeżeli istnieje ujemny cykl to otrzymamy wektor z indeksami kolejnych krawędzi cyklu
 //W przeciwnym wypadku uzupełnia tablicę dist najkrótszymi odległościami od src do każdego wierzchołka
 //Złożoność: O(|V| * |E|)
 
@@ -21,9 +21,8 @@ ll dist[MAXN];
 bool vis[MAXN];
 pair<int, int> p[MAXN]; //Tablica poprzedników (wierzchołek, indeks krawędzi)
 vector<edge> E; //Lista krawędzi (v, u, w, id)
-deque<pair<int, int>> cycle; //Kolejka przechowująca ujemny cykl
 
-deque<pair<int, int>> negCycle(int src, int n)
+vector<pair<int, int>> negCycle(int src, int n)
 {
     for (int i = 1; i <= n; i++)
     {
@@ -31,7 +30,7 @@ deque<pair<int, int>> negCycle(int src, int n)
     }
     dist[src] = 0;
 
-    deque<pair<int, int>> cycle;
+    vector<pair<int, int>> cycle;
     for (int i = 1; i <= n; i++)
     {
         for (auto e : E)
@@ -47,9 +46,10 @@ deque<pair<int, int>> negCycle(int src, int n)
                     while (!vis[v])
                     {
                         vis[v] = 1;
-                        cycle.push_front(p[v]);
+                        cycle.push_back(p[v]);
                         v = p[v].st;
                     }
+                    reverse(cycle.begin(), cycle.end());
                     while (cycle.back() != p[v])
                     {
                         cycle.pop_back();
