@@ -1,39 +1,58 @@
 //matchPattern zwraca wszystkie pozycje wystąpienia wzorca w tekście
+//minCover zwraca długość najkrótszego słowa pokrywającego (szablonu)
 
 struct KMP
 {
     int N;
     string pat;
-    vector<int> ps;
-    KMP(string pat) : N((int)pat.size()), pat(pat), ps(N, 0)
+    vector<int> PS;
+    KMP(string pat) : N((int)pat.size()), pat(pat), PS(N, 0)
     {
-        int k = -1;
+        int len = -1;
         for (int i = 0; i < N; i++)
         {
-            while (pat[k] != pat[i] && k >= 0)
+            while (len >= 0 && pat[len] != pat[i])
             {
-                if (k == 0) k = -1;
-                else k = ps[k-1];
+                len = (len ? PS[len - 1] : -1);
             }
-            k++;
-            ps[i] = k;
+            PS[i] = ++len;
         }
     }
 
     vector<int> matchPattern(string t)
     {
         vector<int> is;
-        int k = 0;
+        int len = 0;
         for (int i = 0; i < t.size();  i++)
         {
-            while (pat[k] != t[i] && k >= 0)
+            while (len >= 0 && pat[len] != t[i])
             {
-                if (k == 0) k = -1;
-                else k = ps[k-1];
+                len = (len ? PS[len - 1] : -1);
             }
-            k++;
-            if (k == N) is.push_back(i-N+1);
+            len++;
+            if (len == N) is.push_back(i - N + 1);
         }
         return is;
+    }
+
+    int minCover()
+    {
+        vector<int> Range, Size;
+        for (int i = 0; i < N; i++)
+        {
+            Range.push_back(i);
+            Size.push_back(i + 1);
+        }
+
+        for (int i = 0; i < N; i++)
+        {
+            int sz = Size[PS[i] - 1];
+            if (PS[i] && i - sz <= Range[sz - 1])
+            {
+                Size[i] = sz;
+                Range[sz - 1] = i;
+            }
+        }
+        return Size.back();
     }
 };
