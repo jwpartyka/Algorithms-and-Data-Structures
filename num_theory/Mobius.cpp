@@ -30,7 +30,7 @@ void Mobius(int n)
 
     for (int i = 1; i <= n; i++)
     {
-        if (abs(mob[i]) == 1)
+        if (abs(mob[i]) != 1)
         {
             mob[i] = 0;
         }
