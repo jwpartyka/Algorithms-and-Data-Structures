@@ -18,7 +18,7 @@ struct point
 
 bool cmp(point a, point b)
 {
-    return (ll)((ll)a.x * (ll)b.y) - (ll)((ll)a.y * (ll)b.x);
+    return (ll)((ll)a.x * (ll)b.y) - (ll)((ll)a.y * (ll)b.x) < 0;
 }
 
 point tab[MAXN];
