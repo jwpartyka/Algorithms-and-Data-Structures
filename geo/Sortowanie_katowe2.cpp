@@ -1,3 +1,7 @@
+//Sortowanie kątowe względem środka układu współrzędnych.
+//Najpierw sortuje punkty, które mają y >= 0, później resztę.
+//Na koniec łączy oba wektory.
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
