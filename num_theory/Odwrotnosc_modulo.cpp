@@ -1,16 +1,20 @@
 //Liczenie odwrotności modulo z małego twierdzenia Fermata
-//a^(p-2) = 1 (mod p)
+//a^(p - 1) = 1 (mod p)
+//a * a^(p - 2) = 1 (mod p) => a^(p - 2) jest odwrotnością a (mod p)
 
-using ll = long long
+using ll = long long;
 
-int pow(int a, int k, int mod)
+constexpr int mod = 1e9 + 7;
+
+int fpow(int a, int k)
 {
     if (k == 1) return a % mod;
-    if (k & 1) return (a * pow(a, k - 1, mod)) % mod;
-    int b = pow(a, k / 2, mod);
-    return (b * b) % mod;
+    if (k & 1) return (ll)((ll)a * (ll)fpow(a, k - 1)) % mod;
+    int b = fpow(a, k / 2);
+    return (ll)((ll)b * (ll)b) % mod;
 }
-int multiply(int a, int b, int mod)
+
+int podziel(int a, int b)
 {
-    return (ll)((ll)a * (ll)pow(b, mod - 2, mod)) % mod;
+    return (ll)((ll)a * (ll)fpow(b, mod - 2)) % mod;
 }
