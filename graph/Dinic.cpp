@@ -1,17 +1,19 @@
 //Znajdywanie maksymalnego przepływu
 //Złożoność O(|V|^2 * |E|), dla grafów z krawędziami jednostkowymi O(|E| * SQRT(|V|))
 
+using ll = long long;
+
 #define st first
 #define nd second
 
-const int MAXN = 205, INF = 1e9;
+const int MAXN = 5e3+5, inf = 1e9;
 
-//Przepustowości krawędzi, odległości, N, ujście, id do addEdge
+//Przepustowości krawędzi, odległości, liczba wierzchołków, ujście, id do addEdge
 int E[MAXN*MAXN], dist[MAXN], n, t, id;
 vector<pair<int, int>> G[MAXN], GL[MAXN]; //Graf, Graf BFS
 
 //Krawędź (a, b) o przepustowości c
-void addEdge(int a, int b, int c)
+inline void addEdge(int a, int b, int c)
 {
     G[a].push_back({b, id});
     E[id++] = c;
@@ -59,9 +61,10 @@ int dfs(int v, int flow)
     }
     for (int i = 0; i < GL[v].size(); i++)
     {
-        int u = GL[v][i].st, x = GL[v][i].nd;
-        int w = E[x], f = 0;
-        if (w) f = dfs(u, min(flow, w));
+        auto e = GL[v][i];
+        int u = e.st, x = e.nd;
+        int f = E[x];
+        if (f) f = dfs(u, min(flow, f));
         if (!f) //(v, u) NIE należy do żadnej ścieżki powiększającej
         {
             //Usuwanie zbędnej krawędzi:
@@ -72,18 +75,18 @@ int dfs(int v, int flow)
         }
         //(v, u) należy do ścieżki powiększającej
         E[x] -= f;
-        E[x^1] += f;
+        E[x ^ 1] += f;
         return f;
     }
     return 0; //Nie znaleziono ścieżki powiększającej
 }
 
-long long dinic(int src)
+ll dinic(int src)
 {
-    long long flow = 0;
+    ll flow = 0;
     while (bfs(src)) //Dopóki istnieje ścieżka powiększająca w grafie
     {
-        while (int f = dfs(src, INF)) //Dopóki istnieje ścieżka powiększająca w grafie BFS
+        while (int f = dfs(src, inf)) //Dopóki istnieje ścieżka powiększająca w grafie BFS
         {
             flow += f;
         }
