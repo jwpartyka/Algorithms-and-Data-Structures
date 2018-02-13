@@ -1,10 +1,12 @@
 //Najwolniejsze, ale proste znajdywanie maksymalnego przepływu
 //Złożoność: O(maxflow * (|V| + |E|))
 
+using ll = long long;
+
 #define st first
 #define nd second
 
-const int MAXN = 205, INF = 1e9;
+const int MAXN = 205, inf = 1e9;
 
 //Przepustowości krawędzi, tablica odwiedzonoych, ujście, id do addEdge, licznik do vis
 int E[MAXN*MAXN], vis[MAXN], t, id, tim = 1;
@@ -20,18 +22,17 @@ void addEdge(int a, int b, int c)
 
 int dfs(int v, int flow)
 {
-    if (!flow || v == t)
+    if (v == t) //Jesteś w ujściu
     {
-        //Przeszedłeś zapchaną krawędzią lub dotarłeś do ujścia
         return flow;
     }
     vis[v] = tim;
     for (auto e : G[v])
     {
         int u = e.st, x = e.nd;
-        int w = E[x];
+        int f = E[x];
         if (vis[u] == tim) continue;
-        int f = dfs(u, min(flow, w));
+        if (f) f = dfs(u, min(flow, f));
         if (f) //(v, u) należy do ścieżki powiększającej
         {
             E[x] -= f;
@@ -42,10 +43,10 @@ int dfs(int v, int flow)
     return 0; //Nie znaleziono ścieżki powiększającej
 }
 
-long long maxflow(int src)
+ll maxflow(int src)
 {
-    long long flow = 0;
-    while (int f = dfs(src, INF))
+    ll flow = 0;
+    while (int f = dfs(src, inf))
     {
         flow += f;
         tim++;
