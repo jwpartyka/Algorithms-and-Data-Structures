@@ -64,14 +64,15 @@ vector<int> saBuild(string &s)
     }
 
     //Obliczanie haszy dla podsłów długości 2 ^ (p + 1):
-    for (int p = 0; (1 << p) < n; p++)
+    int p = 2;
+    while (p < n)
     {
         for (int i = 0; i < n; i++)
         {
             Pair P = {lex[i], 0, i};
-            if (i + (1 << p) < n)
+            if (i + p / 2 < n)
             {
-                P.h2 = lex[i + (1 << p)];
+                P.h2 = lex[i + p / 2];
             }
             pairs[i] = P;
         }
@@ -82,13 +83,14 @@ vector<int> saBuild(string &s)
         ALPHA = 1;
 
         //Zahaszowanie podsłów:
-        lex[pairs.front().pos] = 1;
+        lex[pairs[0].pos] = 1;
         for (int i = 1; i < n; i++)
         {
             //Jeżeli dwa podsłówa są takie same to mają taki sam hasz
             if (pairs[i] != pairs[i - 1]) ALPHA++;
             lex[pairs[i].pos] = ALPHA;
         }
+        p *= 2;
     }
 
     //Uzupełnia tablicę sufiksową:
