@@ -3,120 +3,128 @@
 //LCP oblicza się algorytmem Kasai w O(|s|)
 //Liczba różnych podsłów w O(|s|)
 
-#define st first
-#define nd second
-#define str pair<pair<int, int>, int>
-
 using ll = long long;
 
-const int MAXN = 2e5 + 5;
+const int MAXN = 5e5 + 5;
 
-//lex[i] - które w kolejności leksykograficznej jest podsłowo bazowe zaczynające się na pozycji i
-//id[i] - pozycja sufiksu zaczynającego się w i - tej literze w tablicy sufiksowej
-//ALPHA - aktualna długość alfabetu (różnych podsłów bazowych)
-int lex[MAXN], id[MAXN], ALPHA = 300;
-//tablica kubełkowa do sortowania par:
-vector<str> bucket[MAXN][2];
-
-vector<int> saBuild(string s)
+struct Pair
 {
-    ALPHA = 300;
-    int n = s.size();
-    vector<int> SA(n, 0);
+    int h1, h2, pos;
+    bool operator != (const Pair &b) const
+    {
+        return (h1 != b.h1 || h2 != b.h2);
+    }
+};
 
-    //Tablica lex dla podsłów długości 1 to ich numery ASCII
+//lex[i] - hasz podsłowa zaczynającego się w s[i]
+int lex[MAXN];
+vector<Pair> bucket[2][MAXN]; //Tablica do sortowania kubełkowego:
+
+void bucket_sort(vector<Pair> &pairs, int ALPHA)
+{
+    //Sortowanie po drugim elemencie pary
+    for (auto p : pairs)
+    {
+        bucket[0][p.h2].push_back(p);
+    }
+
+    //Sortowanie po pierwszym elemencie pary
+    for (int i = 0; i <= ALPHA; i++)
+    {
+        for (auto p : bucket[0][i])
+        {
+            bucket[1][p.h1].push_back(p);
+        }
+        bucket[0][i].clear();
+    }
+
+    //Uzupełnianie wektora parami w posortowanej kolejności
+    int ind = 0;
+    for (int i = 0; i <= ALPHA; i++)
+    {
+        for (auto p : bucket[1][i])
+        {
+            pairs[ind++] = p;
+        }
+        bucket[1][i].clear();
+    }
+}
+
+vector<int> saBuild(string &s)
+{
+    int n = s.size();
+    int ALPHA = 1; //Wartość największego hasza
+    vector<Pair> pairs(n);
+
+    //Hasze dla podsłów długości 1 to ich numery ASCII + 1
     for (int i = 0; i < n; i++)
     {
         lex[i] = ((int)s[i] + 1);
+        ALPHA = max(ALPHA, lex[i]);
     }
 
-    //Liczy tablicę lex dla kolejnych potęŋ dwójki:
-    for (int p = 0; (1 << (p - 1)) <= n; p++)
+    //Obliczanie haszy dla podsłów długości 2 ^ (p + 1):
+    for (int p = 0; (1 << p) < n; p++)
     {
         for (int i = 0; i < n; i++)
         {
-            //"Haszuje" podsłowa długości (2 ^ p):
-            str suf = {{lex[i], 0}, i};
-            if (i + (1 << p) < n) suf.st.nd = lex[i + (1 << p)];
-            //Sortuje kubełkowo po drugim elemencie pary:
-            bucket[suf.st.nd][0].push_back(suf);
-        }
-
-        //Sortuje kubełkowo po pierwszym elemencie pary:
-        for (int i = 0; i < ALPHA; i++)
-        {
-            for (auto j : bucket[i][0])
+            Pair P = {lex[i], 0, i};
+            if (i + (1 << p) < n)
             {
-                 bucket[j.st.st][1].push_back(j);
+                P.h2 = lex[i + (1 << p)];
             }
-            bucket[i][0].clear();
+            pairs[i] = P;
         }
 
-        //Przepisuje posortowane pary do wektora V:
-        vector<str> V;
-        for (int i = 0; i < ALPHA; i++)
+        //Sortowanie kubełkowe wszystkich par:
+        bucket_sort(pairs, ALPHA);
+
+        ALPHA = 1;
+
+        //Zahaszowanie podsłów:
+        lex[pairs.front().pos] = 1;
+        for (int i = 1; i < n; i++)
         {
-            for (auto j : bucket[i][1])
-            {
-                 V.push_back(j);
-            }
-            bucket[i][1].clear();
+            //Jeżeli dwa podsłówa są takie same to mają taki sam hasz
+            if (pairs[i] != pairs[i - 1]) ALPHA++;
+            lex[pairs[i].pos] = ALPHA;
         }
-
-        ALPHA = 300;
-        if (V.empty()) continue;
-
-        //Przeskalowuje wszystkie pary:
-        lex[V[0].nd] = 1;
-        for (int i = 1; i < V.size(); i++)
-        {
-            lex[V[i].nd] = lex[V[i - 1].nd] + (V[i].st != V[i - 1].st);
-            ALPHA = max(ALPHA, lex[V[i].nd]);
-        }
-        ALPHA += 3;
     }
 
     //Uzupełnia tablicę sufiksową:
+    vector<int> SA(n);
     for (int i = 0; i < n; i++)
     {
         SA[lex[i] - 1] = i;
-        id[i] = lex[i] - 1;
     }
     return SA;
 }
 
-vector<int> lcpBuild(string s, vector<int> &SA)
+vector<int> lcpBuild(string &s, vector<int> &SA)
 {
     int n = s.size();
-    s += '$';
     vector<int> LCP(n, 0);
 
-    //Znajduje wynik brutalnie dla pierwszego sufiksu:
-    if (id[0] < n - 1)
+    int len = 0;
+    for (int i = 0; i < n; i++)
     {
-        for (int i = 0; s[ SA[id[0] + 1] + i ] == s[i]; i++)
+        //LCP[i + 1] >= LCP[i] - 1
+        len = max(0, len - 1);
+        if (lex[i] == n) continue;
+        //Porównywanie kolejnych sufiksów literka po literce:
+        while (s[i + len] == s[ SA[lex[i]] + len])
         {
-            LCP[id[0]]++;
+            len++;
         }
-    }
-
-    //Uzupełnia tablicę LCP:
-    for (int i = 1; i < n; i++)
-    {
-        if (id[i] == n - 1) continue;
-        LCP[id[i]] = max(0, LCP[id[i - 1]] - 1);
-        for (int j = max(0, LCP[id[i - 1]] - 1); s[ SA[id[i]] + j ] == s[ SA[id[i] + 1] + j]; j++)
-        {
-            LCP[id[i]]++;
-        }
+        LCP[lex[i] - 1] = len;
     }
     return LCP;
 }
 
-int liczbaRoznychPodslow(vector<int> &SA, vector<int> &LCP)
+ll liczbaRoznychPodslow(vector<int> &SA, vector<int> &LCP)
 {
     int n = SA.size();
-    ll res = (ll)n * (ll)n;
+    ll res = (ll)n * n;
     for (int i : SA) res -= i;
     for (int i : LCP) res -= i;
     return res;
