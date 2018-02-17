@@ -110,7 +110,7 @@ vector<int> lcpBuild(string &s, vector<int> &SA)
     int len = 0;
     for (int i = 0; i < n; i++)
     {
-        //LCP[i + 1] >= LCP[i] - 1
+        //LCP[lex[i]] >= LCP[lex[i] - 1] - 1
         len = max(0, len - 1);
         if (lex[i] == n) continue;
         //Porównywanie kolejnych sufiksów literka po literce:
