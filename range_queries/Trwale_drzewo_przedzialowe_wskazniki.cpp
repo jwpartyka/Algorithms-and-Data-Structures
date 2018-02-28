@@ -1,21 +1,23 @@
 //Drzewo trwałe (na wskaźnikach)
-//Kod to rozwiązanie zadania: http://www.spoj.com/problems/PSEGTREE/
-//Zużywa dużo pamięci i czasu
+//Rozwiązuje zadanie: http://www.spoj.com/problems/PSEGTREE/
+//Zużywa więcej czasu i pamięci niż analogiczna wersja na tablicy.
+//Buduje pełne drzewo binarne nawet jeżeli nie wszystkie liście zostaną użyte.
 
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
-const int MAXN = 1e5 + 5, INF = 1024*256;
+const int MAXN = 5e5 + 5;
 
-int tab[MAXN], Base = 1, n;
+int tab[MAXN], Base = 1;
 
 struct Node
 {
     Node * l, * r;
-    int sum, lo, hi;
+    int sum;
 
-    Node(int lo, int hi) : sum(0), lo(lo), hi(hi), l(nullptr), r(nullptr) {}
+    Node() : l(nullptr), r(nullptr), sum(0) {}
 
     ~Node()
     {
@@ -23,48 +25,54 @@ struct Node
         delete r;
     }
 
-    void init()
+    //Tworzy i zwraca wskaźnik na lewego syna:
+    Node * L()
     {
-        if (lo > n) return ;
+        l = new Node();
+        return l;
+    }
+
+    //Tworzy i zwraca wskaźnik na prawego syna:
+    Node * R()
+    {
+        r = new Node();
+        return r;
+    }
+
+    //Uzupełnia wartości w wierzchołkach pierwotnego drzewa przedziałowego:
+    void buildTree(int lo, int hi)
+    {
         if (lo == hi)
         {
             sum = tab[lo];
             return ;
         }
-        int mid = (lo + hi) / 2;
-        L() -> init();
-        R() -> init();
+
+        int mid = lo + hi >> 1;
+        L() -> buildTree(lo, mid);
+        R() -> buildTree(mid + 1, hi);
         sum = l -> sum + r -> sum;
     }
 
-    Node * L()
+    //Dodaje do drzewa nową wersję ścieżki:
+    Node * chTree(Node * node, int lo, int hi, int N, int v)
     {
-        if (l == nullptr) l = new Node(lo, (lo + hi) / 2);
-        return l;
-    }
-
-    Node * R()
-    {
-        if (r == nullptr)  r = new Node((lo + hi) / 2 + 1, hi);
-        return r;
-    }
-
-    Node * chTree(int N, int v, Node * prev)
-    {
-        if (N < lo || hi < N) return prev;
+        if (N < lo || hi < N) return node;
         if (lo == hi)
         {
-            sum = prev -> sum + v;
+            sum = node -> sum + v;
             return this;
         }
 
-        l = L() -> chTree(N, v, prev -> l);
-        r = R() -> chTree(N, v, prev -> r);
+        int mid = lo + hi >> 1;
+        l = L() -> chTree(node -> l, lo, mid, N, v);
+        r = R() -> chTree(node -> r, mid + 1, hi, N, v);
         sum = l -> sum + r -> sum;
         return this;
     }
 
-    int read(int left, int right)
+    //Zczytuje sumę z przedziału [l, r]:
+    int read(int lo, int hi, int left, int right)
     {
         if (right < lo || hi < left) return 0;
         if (left <= lo && hi <= right)
@@ -72,21 +80,18 @@ struct Node
             return sum;
         }
 
-        return l -> read(left, right) + r -> read(left, right);
-    }
-
-    void display()
-    {
-        if (l != nullptr) L() -> display();
-        cout << lo << " " << hi << " " << sum << "\n";
-        if (r != nullptr) R() -> display();
+        int mid = lo + hi >> 1;
+        return l -> read(lo, mid, left, right) +
+                r -> read(mid + 1, hi, left, right);
     }
 };
 
-Node * Tree[MAXN];
-void init(int x)
+vector<Node *> Tree; //Lista korzeni kolejnych wersji drzewa
+
+//Tworzy korzeń drzewa:
+void newTree()
 {
-    Tree[x] = new Node(1, Base);
+    Tree.push_back(new Node());
 }
 
 int main()
@@ -94,36 +99,38 @@ int main()
     ios_base::sync_with_stdio(0);
     cin.tie(0);
 
+    int n;
     cin >> n;
-    while (Base < n) Base *= 2;
-    init(0);
+    while (Base < n) Base <<= 1;
+
     for (int i = 1; i <= n; i++)
     {
         cin >> tab[i];
     }
 
-    Tree[0] -> init();
+    newTree();
+    Tree[0] -> buildTree(1, Base);
 
     int q;
     cin >> q;
-    int nr = 1;
-    for (int i = 0; i < q; i++)
+    int num = 0;
+    while (q--)
     {
         int co;
         cin >> co;
-        if (co == 2)
-        {
-            int id, l, r;
-            cin >> id >> l >> r;
-            cout << Tree[id] -> read(l, r) << "\n";
-        }
-        else
+        if (co == 1)
         {
             int id, pos, v;
             cin >> id >> pos >> v;
-            init(nr);
-            Tree[nr] -> chTree(pos, v, Tree[id]);
-            nr++;
+            newTree();
+            num++;
+            Tree[num] -> chTree(Tree[id], 1, Base, pos, v);
+        }
+        else
+        {
+            int id, l, r;
+            cin >> id >> l >> r;
+            cout << Tree[id] -> read(1, Base, l, r) << "\n";
         }
     }
 }
