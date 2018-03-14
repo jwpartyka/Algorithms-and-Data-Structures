@@ -8,52 +8,55 @@
 #define st first
 #define nd second
 
-const int MAXN = 2e3+5, INF = 1e9;
+const int MAXN = 2e3+5, inf = 1e9;
+
+struct edge
+{
+    int v, u, w;
+};
+
 int dist[MAXN][MAXN], h[MAXN]; //Odległości, potencjały
 vector<pair<int, int>> G[MAXN]; //Graf
-vector<pair<pair<int, int>, int>> E; //Lista krawędzi do Bellmana-Forda
+vector<edge> E; //Lista krawędzi do Bellmana-Forda
 priority_queue<pair<int, int>> Q; //Kolejka do Dijkstry
 
-bool relax()
-{
-    bool ok = 1;
-    for (auto e : E)
-    {
-        int v = e.st.st, u = e.st.nd, w = e.nd;
-        if (h[u] > h[v] + w)
-        {
-            ok = 0;
-            h[u] = h[v] + w;
-        }
-    }
-    return ok;
-}
 bool bellman_ford(int n)
 {
-    for (int i = 1; i < n; i++)
+    for (int i = 1; i <= n; i++)
     {
-        relax();
+        for (auto e : E)
+        {
+            int v = e.v, u = e.u, w = e.w;
+            if (h[u] > h[v] + w)
+            {
+                if (i == n) return 0; //Występuje ujemny cykl
+                h[u] = h[v] + w;
+            }
+        }
     }
-    return relax();
+    return 1;
 }
 
-void dijkstra(int v0, int n)
+void dijkstra(int src, int n)
 {
-    for (int i = 1; i <= n; i++) dist[v0][i] = INF;
-    dist[v0][v0] = 0;
-    Q.push({0, v0});
+    for (int i = 1; i <= n; i++) dist[src][i] = inf;
+
+    dist[src][src] = 0;
+    Q.push({0, src});
+
     while (!Q.empty())
     {
-        int v = Q.top().nd, ww = Q.top().st;
+        int v = Q.top().nd, w = Q.top().st;
         Q.pop();
-        if (dist[v0][v] > ww) continue;
+        if (dist[src][v] > w) continue;
+
         for (auto e : G[v])
         {
             int u = e.st, w = e.nd + h[v] - h[u];
-            if (dist[v0][u] > dist[v0][v] + w)
+            if (dist[src][u] > dist[src][v] + w)
             {
-                dist[v0][u] = dist[v0][v] + w;
-                Q.push({-dist[v0][u], u});
+                dist[src][u] = dist[src][v] + w;
+                Q.push({-dist[src][u], u});
             }
         }
     }
@@ -61,10 +64,8 @@ void dijkstra(int v0, int n)
 
 bool johnson(int n)
 {
-
     if (bellman_ford(n)) //Oblicza potencjały, szuka ujemnego cyklu
     {
-
         for (int i = 1; i <= n; i++)
         {
             //Oblicza odległości pomiędzy każdą parą wierzchołków (i, v)
