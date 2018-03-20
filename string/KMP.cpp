@@ -1,38 +1,44 @@
-//matchPattern zwraca wszystkie pozycje wystąpienia wzorca w tekście
-//minCover zwraca długość najkrótszego słowa pokrywającego (szablonu)
+//matchptern zwraca wszystkie pozycje wystąpienia wzorca p w tekście s
+//Można również wyszukać wzorzec p w tekście s tworząc KMP dla słowa p + '$' + s.
+//Złożoność: O(|s| + |p|)
+//Source: wazniak.mimuw.edu.pl
 
 struct KMP
 {
     int N;
-    string pat;
-    vector<int> PS;
-    KMP(string pat) : N((int)pat.size()), pat(pat), PS(N, 0)
+    string p;
+    vector<int> ps;
+
+    KMP(string p) : N((int)p.size()), p(p), ps(N, 0)
     {
-        int len = -1;
+        int k = -1;
         for (int i = 0; i < N; i++)
         {
-            while (len >= 0 && pat[len] != pat[i])
+            while (p[k] != p[i] && k >= 0)
             {
-                len = (len ? PS[len - 1] : -1);
+                if (k == 0) k = -1;
+                else k = ps[k - 1];
             }
-            PS[i] = ++len;
+            k++;
+            ps[i] = k;
         }
     }
 
-    vector<int> matchPattern(string t)
+    vector<int> matchptern(string s)
     {
-        vector<int> is;
-        int len = 0;
-        for (int i = 0; i < t.size();  i++)
+        vector<int> occur;
+        int k = 0;
+        for (int i = 0; i < s.size();  i++)
         {
-            while (len >= 0 && pat[len] != t[i])
+            while (p[k] != s[i] && k >= 0)
             {
-                len = (len ? PS[len - 1] : -1);
+                if (k == 0) k = -1;
+                else k = ps[k - 1];
             }
-            len++;
-            if (len == N) is.push_back(i - N + 1);
+            k++;
+            if (k == N) occur.push_back(i - N + 1);
         }
-        return is;
+        return occur;
     }
 
     int minCover()
@@ -46,13 +52,12 @@ struct KMP
 
         for (int i = 0; i < N; i++)
         {
-            int sz = Size[PS[i] - 1];
-            if (PS[i] && i - sz <= Range[sz - 1])
+            int sz = Size[P[i]-1];
+            if (P[i] && i - sz <= Range[sz - 1])
             {
                 Size[i] = sz;
                 Range[sz - 1] = i;
             }
         }
-        return Size.back();
     }
 };
