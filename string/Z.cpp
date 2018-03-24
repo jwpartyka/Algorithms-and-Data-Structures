@@ -1,8 +1,8 @@
 //Zwraca tablicę Z dla słowa S
 //Żeby wuszukać wzorzec P w tekście T: S = P + '$' + T;
 //Złożoność: O(|S|)
+//Source: Marek Sommer
 
-//Dłuższa, może bardziej czytelna wersja:
 vector<int> Z_Function(string s)
 {
     vector<int> Z(s.size());
@@ -30,30 +30,5 @@ vector<int> Z_Function(string s)
         //Jeżeli (i - m > len) -> len = 0, w przeciwnym wypadku len -= i - m
         len -= min(len, i - m);
     }
-    return Z;
-}
-
-//Krótka wersja:
-vector<int> Z_Function(string s)
-{
-    //Dodanie znaku niewystępującego w alfabecie, aby skrócić warunek w pierwszym while
-    s += '#';
-    vector<int> Z(s.size());
-    for (int i = 1, m = 1, len = 0; i < s.size(); len -= min(len, i-m), m = i)
-    {
-        //Dopóki słowo s[i...i+len] jest równe prefiksowi s[0...len]:
-        while (s[i + len] == s[len])
-        {
-            len++;
-        }
-        Z[i++] = len;
-        //Dopóki można uzupełnić Z[i] w zależności od poprzednio obliczoncyh wartości:
-        while (i + Z[i - m] < m + len)
-        {
-             Z[i++] = Z[i - m];
-        }
-    }
-    //Usuwa wartość dla znaku '#'
-    Z.pop_back();
     return Z;
 }
