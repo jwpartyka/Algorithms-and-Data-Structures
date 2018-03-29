@@ -36,6 +36,7 @@ ll norm(point a)
     return a.x * a.x + a.y * a.y;
 }
 
+//Znajduje otoczkę
 vector<point> getHull(vector<point> &P)
 {
     vector<point> H = {P[0]};
@@ -55,17 +56,20 @@ vector<point> getHull(vector<point> &P)
 
 vector<point> Graham(vector<point> P)
 {
+    //Znajduje punkt o najmniejszym x, y
     swap(P[0], *min_element(P.begin(), P.end(), [](point a, point b)
     {
         if (a.x == b.x) return a.y < b.y;
         return a.x < b.x;
     }));
+    //Sortuje kątowo względem P[0]
     sort(P.begin() + 1, P.end(), [&P](point a, point b)
     {
         ll cr = cross(P[0], a, b);
         if (cr == 0) return norm(a - P[0]) < norm(b - P[0]);
         return cr > 0;
     });
+    //Usuwa duplikaty punktów
     P.erase(unique(P.begin(), P.end(), [](point a, point b)
     {
         return (a.x == b.x and a.y == b.y);
