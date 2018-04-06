@@ -11,17 +11,18 @@
 // 1) Preprocessing: O(N)
 // 2) Query: O(log N)
 
-const int MAXN = 1e9+5;
+const int MAXN = 3e5 + 5, inf = 1e9;
 
 int tab[MAXN];
+map<int, int> sc;
 
 struct Wavelet
 {
     Wavelet * left, * right;
-    int l, r;
+    int lo, hi;
     vector<int> seq, ML;
 
-    Wavelet(int l, int r) : l(l), r(r), left(nullptr), right(nullptr) {}
+    Wavelet(int lo, int hi) : lo(lo), hi(hi), left(nullptr), right(nullptr) {}
 
     void init(int n)
     {
@@ -33,11 +34,12 @@ struct Wavelet
 
     void build()
     {
-        if (l == r) return ;
+        if (lo == hi) return ;
 
-        int mid = (l + r) / 2;
-        left = new Wavelet(l, mid);
-        right = new Wavelet(mid + 1, r);
+        int mid = lo + hi >> 1;
+        left = new Wavelet(lo, mid);
+        right = new Wavelet(mid + 1, hi);
+
         ML.push_back(0);
         for (int i : seq)
         {
@@ -59,12 +61,13 @@ struct Wavelet
     int cntK(int b, int k)
     {
         if (b <= 0) return 0;
-        if (l == r)
+        if (lo == hi)
         {
-            if (l != k) return 0;
+            if (lo != k) return 0;
             return b;
         }
-        int mid = (l + r) / 2;
+
+        int mid = lo + hi >> 1;
         if (k <= mid) return left -> cntK(ML[b], k);
         return right -> cntK(b - ML[b], k);
     }
@@ -73,12 +76,13 @@ struct Wavelet
     int LTE(int b, int k)
     {
         if (b <= 0) return 0;
-        if (l == r)
+        if (lo == hi)
         {
-            if (l <= k) return b;
+            if (lo <= k) return b;
             return 0;
         }
-        int mid = (l + r) / 2;
+
+        int mid = lo + hi >> 1;
         if (k <= mid) return left -> LTE(ML[b], k);
         return ML[b] + right -> LTE(b - ML[b], k);
     }
@@ -92,7 +96,8 @@ struct Wavelet
     // Kth smallest number in range [a, b]
     int kth(int a, int b, int k)
     {
-        if (l == r) return l;
+        if (lo == hi) return lo;
+
         int x = ML[b] - ML[a - 1];
         if (x >= k) return left -> kth(ML[a - 1] + 1, ML[b], k);
         return right -> kth(a - ML[a - 1], b - ML[b], k - x);
@@ -103,7 +108,8 @@ struct Wavelet
     {
         seq[i - 1] = j;
         if (lo == hi) return ;
-        int mid = (lo + hi) / 2;
+
+        int mid = lo + hi >> 1;
         if (tab[j] <= mid) left -> swapUpdate(ML[i], j);
         else right -> swapUpdate(i - ML[i], j);
     }
@@ -112,6 +118,7 @@ struct Wavelet
     void swap(int i)
     {
         if (lo == hi) return ;
+
         if (ML[i] > ML[i - 1] && ML[i + 1] > ML[i]) left -> swap(ML[i]);
         else if (ML[i] == ML[i - 1] && ML[i + 1] == ML[i]) right -> swap(i - ML[i]);
         else
@@ -146,10 +153,31 @@ struct Wavelet
     }
 };
 
+void compress(int n)
+{
+    for (int i = 1; i <= n; i++)
+    {
+        sc[tab[i]];
+        sc[i];
+    }
+
+    int num = 1;
+    for (auto &v : sc)
+    {
+        v.second = num++;
+    }
+
+    for (int i = 1; i <= n; i++)
+    {
+        tab[i] = sc[tab[i]];
+    }
+}
+
 Wavelet * Tree;
 void init(int n)
 {
-    Tree = new Wavelet(1, MAXN);
-    Wave -> init(n);
-    Wave -> build();
+    //compress(n);
+    Tree = new Wavelet(1, /*sc.size()*/ inf);
+    Tree -> init(n);
+    Tree -> build();
 }
