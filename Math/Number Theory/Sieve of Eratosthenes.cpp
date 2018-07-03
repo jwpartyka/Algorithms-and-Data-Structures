@@ -1,13 +1,14 @@
 // Sieve of Eratosthenes
-// Complexity: O(N * log(log N))
-// Prime factorization of n in O(log n)
+// Complexity:
+// 1) Sieve: O(n * log log n)
+// 2) Prime factorization: O(log n)
 
-const int MAXN = 1e6+5;
+const int MAXN = 1e7+5;
 
 int sieve[MAXN], sum[MAXN];
 
 // Computing the sieve
-void calcSieve(int n)
+void Sieve(int n)
 {
     for (int i = 2; i * i <= n; i++)
     {
@@ -19,6 +20,7 @@ void calcSieve(int n)
             }
         }
     }
+
     for (int i = 2; i <= n; i++)
     {
         sum[i] = sum[i - 1];
@@ -33,7 +35,8 @@ void calcSieve(int n)
 // Number of prime numbers in range [l, r]
 int countPrimes(int l, int r)
 {
-    return sum[r] - sum[l - 1];
+    if (l) return sum[r] - sum[l - 1];
+    return sum[r];
 }
 
 // Returns a vector with prime factorization of x

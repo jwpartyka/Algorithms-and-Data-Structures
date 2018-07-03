@@ -4,9 +4,9 @@
 // mu[n] = 1 if n is a square - free positive integer with an even number of distinct prime factors
 // mu[n] = -1 if n is a square - free positive integer with an odd number of distinct prime factors
 // If n = p1 * p2 * ... * pk then n / -p1 / -p2 / ... / -pk = (-1)^k
-// Sum over mu[d] for every divisor d of n equals 0
-// If gcd(a, b) = q then mu[a * b] = mu[a] * mu[b]
-// Complexity: O(N * log N)
+// Sum of mu[d] for every divisor d of n equals 0
+// If gcd(a, b) = 1 then mu[a * b] = mu[a] * mu[b]
+// Complexity: O(n * log n)
 // Source: Wikipedia
 // Usage: Inclusion - Exclusion Principle
 

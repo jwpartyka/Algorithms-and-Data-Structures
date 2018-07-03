@@ -1,8 +1,8 @@
-// Computing modular multiplication inverse of a mod m using Euler's theorem:
+// Computing modular multiplicative inverse of a mod m using Euler's theorem:
 // a * (a ^ (m - 2)) == 1 mod m
-// Complexity: O(log a)
+// Complexity: O(log m)
 
-// Computing modular multiplication inverse of a mod m using Extended Euclid:
+// Computing modular multiplicative inverse of a mod m using Extended Euclid:
 // ax + my == gcd(a, m)
 // ax == 1 mod m
 // Complexity: O(log a)
@@ -15,17 +15,17 @@ using ll = long long
 #define nd second
 
 // Euler's theorem:
-int pow(int a, int k, int mod)
+int modPow(int a, int b, int mod)
 {
-    if (k == 1) return a % mod;
-    if (k & 1) return (a * pow(a, k - 1, mod)) % mod;
-    int b = pow(a, k / 2, mod);
-    return (b * b) % mod;
+    if (b <= 0) return 1;
+    if (b & 1) return ((ll)a * modPow(a, b - 1, mod)) % mod;
+    int c = modPow(a, b / 2, mod);
+    return ((ll)c * c) % mod;
 }
 
-int getInverse(int a, int mod)
+int modInv(int a, int mod)
 {
-    return pow(a, mod - 2);
+    return modPow(a, mod - 2);
 }
 
 // Extended Euclid:
@@ -36,13 +36,13 @@ pair<int, int> ExtGCD(int a, int b)
     return {p.nd - p.st * (b / a), p.st};
 }
 
-int getInverse(int a, int mod)
+int modInv(int a, int mod)
 {
     auto p = ExtGCD(a, mod);
     return p.st;
 }
 
-int multiply(int a, int b, int mod)
+int divide(int a, int b, int mod)
 {
-    return (ll)((ll)a * getInverse(b, mod)) % mod;
+    return ((ll)a * modInv(b, mod)) % mod;
 }
