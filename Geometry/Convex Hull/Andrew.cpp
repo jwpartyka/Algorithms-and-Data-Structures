@@ -62,7 +62,7 @@ vector<point> getHull(vector<point> &P)
 }
 
 // Returns convex hull
-vector<point> Jarvis(vector<point> P)
+vector<point> Andrew(vector<point> P)
 {
     // Sorts points lexicographically
     sort(P.begin(), P.end());

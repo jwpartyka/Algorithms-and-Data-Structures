@@ -1,5 +1,5 @@
 // Returns Z - Array of string S
-// To match pattern P in string T: S = P + '$' + T
+// To search for pattern P in string T: S = P + '$' + T
 // Complexity: O(|S|)
 // Usage: [CF Round #246] Prefixes and Suffixes http://codeforces.com/problemset/problem/432/D
 
@@ -27,7 +27,7 @@ vector<int> Z_Function(string s)
         }
 
         // Updates the length of the current longest matching preffix
-        // If (i - m > len) -> len = 0, else len -= i - m
+        // If (i - m > len) -> len = 0, else -> len -= (i - m)
         len -= min(len, i - m);
     }
     return Z;
