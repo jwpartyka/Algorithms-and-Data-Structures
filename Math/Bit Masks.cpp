@@ -1,18 +1,18 @@
 bool bit(int mask, int i)
 {
-    return (mask & (1<<i));
+    return (mask & (1 << i));
 }
 int on(int mask, int i)
 {
-    return (mask | (1<<i));
+    return (mask | (1 << i));
 }
 int off(int mask, int i)
 {
-    return ((mask | (1<<i)) ^ (1<<i));
+    return ((mask | (1 << i)) ^ (1 << i));
 }
 int flip(int mask, int i)
 {
-    return (mask ^ (1<<i));
+    return (mask ^ (1 << i));
 }
 int countOnes(int mask)
 {
@@ -33,5 +33,5 @@ int trailingZeros(int mask)
 }
 int smaller2power(int x)
 {
-    return 30 - zeraWiodace(x);
+    return 30 - leadingZeros(x);
 }
