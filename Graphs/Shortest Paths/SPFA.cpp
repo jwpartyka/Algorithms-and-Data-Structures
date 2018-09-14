@@ -1,42 +1,46 @@
 // Computes shortest paths from the source to every other vertex
 // Returns 0 in case of a negative cycle
 // On graphs with positive weight only it's better to use Dijkstra
-// Usually runs faster than Bellman - Ford but worst - case complexity is the same
+// Usually runs faster than Bellman-Ford but worst-case complexity is the same
 // It's useful in mincost
-// Usage: [SPOJ] NEGCYC http://www.spoj.com/problems/NEGCYC/
 
 #define st first
 #define nd second
 
-const int MAXN = 5e5+5, INF = 1e9;
-int dist[MAXN]; // Distances from the source
-vector<pair<int, int>> G[MAXN]; // Graph
-queue<pair<int, int>> Q; // Queue for SPFA
-int relax[MAXN]; // relax[v] = how many times has a path to v been relaxed
+const int MAXN = 1e4 + 5, inf = 1e9 + 5;
 
-bool SPFA(int start, int n)
+int dist[MAXN], cnt[MAXN]; // Distance from the source, cnt[v] = how many times paths to v have been relaxed
+vector<pair<int, int>> G[MAXN];
+
+bool SPFA(int src, int n)
 {
-    for (int i = 1; i <= n; i++) dist[i] = INF;
-    dist[start] = 0;
-    Q.push({0, start});
-    while(!Q.empty())
+    for (int i = 1; i <= n; i++)
     {
-        int v = Q.front().nd;
-        int ww = Q.front().st;
-        Q.pop();
-        if (dist[v] < ww) continue;
+        dist[i] = inf;
+    }
+    dist[src] = 0;
+
+    deque<pair<int, int>> Q;
+    Q.push_front({src, 0});
+    while (!Q.empty())
+    {
+        int v = Q[0].st, w = Q[0].nd;
+        Q.pop_front();
+        if (dist[v] < w) continue;
+
         for (auto e : G[v])
         {
             int u = e.st, w = e.nd;
             if (dist[u] > dist[v] + w)
             {
-                relax[u]++;
-                // If a path to vertex v was relaxed n times then there is a negative cycle
-                if (relax[u] == n) return 0;
                 dist[u] = dist[v] + w;
-                Q.push({dist[u], u});
+                if (dist[u] < Q[0].nd) Q.push_front({u, dist[u]});
+                else Q.push_back({u, dist[u]});
+                cnt[u]++;
+                if (cnt[u] == n) return 0;
             }
         }
     }
+
     return 1;
 }
