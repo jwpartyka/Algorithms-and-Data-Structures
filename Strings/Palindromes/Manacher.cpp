@@ -31,7 +31,7 @@ vector<int> Manacher(string &s, int n)
         l++;
 
         // Let C be the index for which we calculated the radius in the loop above.
-        // We can compute the radiuses for indexes i = C + l by using radiuses
+        // We can compute the radii for indexes i = C + l by using radiuses
         // computed beforehand for indexes m = C - l while l < R[C] - 1
         // or the left end of the palindrome with center in m won't meet the left
         // end of the palindrome with center in C
