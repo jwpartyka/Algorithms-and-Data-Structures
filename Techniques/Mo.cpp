@@ -8,13 +8,14 @@ struct query
     int x, y, pos, res;
     short sqrt;
     bool operator < (const query &b) const
-    {
-        if (sqrt == b.sqrt)
-        {
-            return ((sqrt & 1) ^ y < b.y);
-        }
-        return x > b.x;
-    }
+	{
+		if (sqrt == b.sqrt)
+		{
+		    if (y == b.y) return pos < b.pos;
+		    return ((sqrt & 1) ^ (y < b.y));
+		}
+		return x > b.x;
+	}
 };
 
 int res[MAXN];
