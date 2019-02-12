@@ -1,4 +1,4 @@
-// Kuhn's algorithm for finding maximum barpitite matching
+// Kuhn's algorithm for finding maximum bipartite matching
 // Complexity: O(|V| * |E|)
 // Usage: [SPOJ] MATCHING http://www.spoj.com/problems/MATCHING/
 
