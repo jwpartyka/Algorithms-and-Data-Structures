@@ -1,7 +1,6 @@
 // Computes distances between every pair of vertices
 // Returns 0 in case of a negative cycle
 // Complexity: O(|V|^3)
-// Usage: [SPOJ] NEGCYC http://www.spoj.com/problems/NEGCYC/
 
 const int MAXN = 5e2+5, INF = 1e9;
 int dist[MAXN][MAXN]; // Distances
@@ -12,7 +11,7 @@ bool floyd_warshall(int n)
     {
         for (int j = i + 1; j <= n; j++)
         {
-            // If edge(i, j) existed it would have a non - negative weight
+            // If edge(i, j) existed it would have a non-negative weight
             if (!dist[i][j]) dist[i][j] = INF;
             if (!dist[j][i]) dist[j][i] = INF;
         }

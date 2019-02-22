@@ -1,17 +1,17 @@
 //Usage: [Yandex.Algorithm 2011 Round 2] Powerful Array http://codeforces.com/problemset/problem/86/D
+ 
+const int MAXN = 1e5 + 5, SQRT = 100;
 
-const int MAXN = 3e5+5;
-constexpr int SQRT = 550;
+struct query {
+    int x, y, id, res;
+    short sq;
 
-struct query
-{
-    int x, y, pos, res;
-    short sqrt;
-    bool operator < (const query &b) const
-    {
-        if (sqrt == b.sqrt)
-        {
-            return ((sqrt & 1) ^ y < b.y);
+    bool operator <(const query &b) const {
+        if (sq == b.sq) {
+            if (y == b.y) {
+                return id < b.id;
+            }
+            return ((sq & 1) ^ (y < b.y));
         }
         return x > b.x;
     }
@@ -20,50 +20,35 @@ struct query
 int res[MAXN];
 query que[MAXN];
 
-inline void dodaj(int i, int j, int op)
-{
-    /* Updates values */
+inline void modify(int a, int v) {
+    /* ... */
 }
 
-inline void update(int i, int a, int b)
-{
-    int op = 1;
-    if (a < b) op = -1;
-    else swap(a, b);
-    for (int j = a; j < b; j++)
-    {
-        dodaj(i, j, op);
+inline void update(int a, int b, int v) {
+    for (int i = a; i <= b; i++) {
+         modify(i, v);
     }
 }
 
-void solve(int q)
-{
-    for (int i = 0; i < q; i++)
-    {
-        que[i].pos = i;
-        que[i].sqrt = que[i].x / SQRT;
-    }
-
+void Mo(int q) {
     sort(que, que + q);
+    int x = 0, y = -1;
+    for (int i = 0; i < q; i++) {
+        if (que[i].x > x) {
+            update(x, que[i].x - 1, -1);
+        }
+        else {
+            update(que[i].x, x - 1, 1);
+        }
 
-    int x = que[0].x, y = que[0].y;
-    for (int i = x; i <= y; i++)
-    {
-        dodaj(0, i, 1);
-    }
-    res[que[0].pos] = que[0].res;
+        if (que[i].y > y) {
+            update(y + 1, que[i].y, 1);
+        }
+        else {
+            update(que[i].y + 1, y, -1);
+        }
 
-    for (int i = 1; i < q; i++)
-    {
-        que[i].res = que[i - 1].res;
-        update(i, x, que[i].x);
-        update(i, que[i].y, y);
+        res[que[i].id] = que[i].res;
         x = que[i].x, y = que[i].y;
-        res[que[i].pos] = que[i].res;
-    }
-
-    for (int i = 0; i < q; i++)
-    {
-        cout << res[i];
     }
 }

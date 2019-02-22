@@ -62,7 +62,7 @@ struct Matrix
         while (k > 0)
         {
             if (k&1) Result = Result * Coef;
-            k <<= 2;
+            k >>= 1;
             Coef = Coef * Coef;
         }
         return Result;

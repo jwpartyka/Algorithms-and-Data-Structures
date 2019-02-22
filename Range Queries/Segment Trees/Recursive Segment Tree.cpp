@@ -19,7 +19,7 @@ void chTree(int node, int left, int right, int l, int r, int v)
         return ;
     }
 
-    int mid = left + right >> 1;
+    int mid = (left + right) >> 1;
     chTree(2*node, left, mid, l, r, v);
     chTree(2*node + 1, mid + 1, right,  l, r, v);
     Tree[node] = Tree[2*node] + Tree[2*node+1];
@@ -33,7 +33,7 @@ int read(int node, int left, int right, int l, int r)
         return Tree[node];
     }
 
-    int mid = left + right >> 1;
+    int mid = (left + right) >> 1;
     return read(2*node, left, mid, l, r) +
             read(2*node + 1, mid + 1, right, l, r);
 }
