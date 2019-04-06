@@ -21,7 +21,7 @@ struct SA {
     vector<int> s;
     int n;
 
-    SA(vector<int> s_) : s(s_) {
+    SA(vector<int> _s) : s(_s) {
         n = s.size();
         x.resize(n);
         rank = s;
