@@ -15,7 +15,7 @@ struct Node {
     bool flip;
 
     Node() {}
-    Node(int v) : val(v), sz(1), flip(0), l(nullptr), r(nullptr) {
+    Node(int v) : val(v), sz(1), sum(v), flip(0), l(nullptr), r(nullptr) {
         pri = rand() + (rand()<<15);
     }
 };
