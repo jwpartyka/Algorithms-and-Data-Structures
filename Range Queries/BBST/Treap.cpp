@@ -140,6 +140,21 @@ int countSmaller(Node *t, int k, int res = 0) {
     return countSmaller(t->r, k, res + getsz(t->l) + 1);
 }
 
+int read(Node *t, int lo, int hi, int l, int r) {
+    if (!t or r < lo or hi < l) {
+        return 0;
+    }
+    if (l <= lo and hi <= r) {
+        return t->sum;
+    }
+    int mid = lo + getsz(t->l);
+    int res = read(t->l, lo, mid - 1, l, r) + read(t->r, mid + 1, hi, l, r);
+    if (l <= mid and mid <= r) {
+        res += t->val;
+    }
+    return res;
+}
+
 void prt(Node *t) {
     if (!t) {
         return;
