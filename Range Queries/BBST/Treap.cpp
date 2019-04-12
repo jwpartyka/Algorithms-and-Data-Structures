@@ -6,8 +6,6 @@
 
 const int inf = 1e9;
 
-set<int> S;
-
 struct Node {
     int pri, val, sz;
     int sum;
@@ -84,15 +82,13 @@ Node* merge(Node *l, Node *r) {
     }
     touch(l);
     touch(r);
-    Node *t;
     if (l->pri > r->pri) {
         l->r = merge(l->r, r);
-        t = l;
+        return update(l);
     } else {
         r->l = merge(l, r->l);
-        t = r;
+        return update(r);
     }
-    return update(t);
 }
 
 Node* ins(Node *t, int k) {
